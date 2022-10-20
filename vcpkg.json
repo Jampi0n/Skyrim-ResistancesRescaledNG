@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "resistances-rescaled",
+  "version-string": "3.3.0",
+  "port-version": 0,
+  "description": "Version independent plugin for Resistances Rescaled based on https://gitlab.com/colorglass/commonlibsse-sample-plugin",
+  "homepage": "https://www.nexusmods.com/skyrimspecialedition/mods/20503",
+  "license": "GPL-3.0",
+  "features": {
+    "plugin": {
+      "description": "Build the SKSE plugin.",
+      "dependencies": [
+        "commonlibsse-ng"
+      ]
+    }
+  },
+  "default-features": [
+    "plugin"
+  ]
+}
