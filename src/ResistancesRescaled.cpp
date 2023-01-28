@@ -36,8 +36,8 @@ namespace ResistancesRescaled {
 		return akActor->AsActorValueOwner()->GetActorValue(av);
 	}
 
-#define GET_DATA_VANILLA_VALUE(index) data[index * ELEMENTS_PER_AV]
-#define GET_DATA_MAPPED_VALUE(index) data[index * ELEMENTS_PER_AV+1]
+#define GET_DATA_MAPPED_VALUE(index) data[index * ELEMENTS_PER_AV]
+#define GET_DATA_VANILLA_VALUE(index) data[index * ELEMENTS_PER_AV+1]
 
 #define FORCE_UPDATE data[21]
 #define UPDATE_RUNNING data[22]
@@ -49,9 +49,9 @@ namespace ResistancesRescaled {
 #define AV_RESET data[28]
 #define AV_UPDATED data[29]
 
-#define RESET(av, id) ModActorValue(akActor, av, static_cast<float>(GET_DATA_MAPPED_VALUE(id) - GET_DATA_VANILLA_VALUE(id))); \
-	GET_DATA_MAPPED_VALUE(id) = 0; \
+#define RESET(av, id) ModActorValue(akActor, av, static_cast<float>(GET_DATA_VANILLA_VALUE(id) - GET_DATA_MAPPED_VALUE(id))); \
 	GET_DATA_VANILLA_VALUE(id) = 0; \
+	GET_DATA_MAPPED_VALUE(id) = 0; \
 	AV_RESET |= (1u << id); \
 	AV_UPDATED |= (1u << id)
 
@@ -112,13 +112,14 @@ namespace ResistancesRescaled {
 		if (difference != 0 || forceUpdate) {
 			AV_UPDATED |= (1u << id);
 			// The vanilla resistance value in the last update.
-			int32_t combinedValue = data[id * ELEMENTS_PER_AV + 1];
+			int32_t combinedValue = GET_DATA_VANILLA_VALUE(id);
 
 			// Update to vanilla resistance value  in current update.
 			combinedValue += difference;
 
 			// Save in array.
-			data[id * ELEMENTS_PER_AV + 1] = combinedValue;
+
+			GET_DATA_VANILLA_VALUE(id) = combinedValue;
 
 			if (doRescaling) {
 				// Calculate new rescaled result.
@@ -131,14 +132,14 @@ namespace ResistancesRescaled {
 				ModActorValue(akActor, actorValue, static_cast<float>(modValue));
 
 				// Save modValue in array. This will be lastValue in the next update.
-				data[id * ELEMENTS_PER_AV] = newValue + modValue;
+                GET_DATA_MAPPED_VALUE(id) = newValue + modValue;
 				AV_RESCALED |= (1u << id);
 			} else {
-				data[id * ELEMENTS_PER_AV] = combinedValue;
+                GET_DATA_MAPPED_VALUE(id) = combinedValue;
 			}
 			size_t spellIndex = id;
 			RE::SpellItem* spell;
-			auto mag = data[id * ELEMENTS_PER_AV];
+            auto mag = GET_DATA_MAPPED_VALUE(id);
 			displaySpells[spellIndex * 2]->effects[0]->effectItem.magnitude = mag;
 			displaySpells[spellIndex * 2 + 1]->effects[0]->effectItem.magnitude = mag;
 		}
@@ -197,13 +198,12 @@ namespace ResistancesRescaled {
 		} else {
 			UPDATE_MASK = RESISTANCE_ENABLED_MASK;
 
+			if (RESET_RESISTANCE > 0) {
+                ApplyReset(akActor, data);
+            }
+
 			RescaleAll(akActor, data, UPDATE_MASK, floatParameters, static_cast<bool>(FORCE_UPDATE), displaySpells);
 			FORCE_UPDATE = 0;
-
-			if (RESET_RESISTANCE > 0) {
-				ApplyReset(akActor, data);
-			}
-
 		}
 		AV_RESCALED = static_cast<int32_t>(static_cast<uint32_t>(AV_RESCALED) & ~static_cast<uint32_t>(AV_RESET));
 		return data;
