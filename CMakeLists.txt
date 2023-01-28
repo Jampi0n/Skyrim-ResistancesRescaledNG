@@ -6,7 +6,7 @@ message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}.")
 ########################################################################################################################
 project(
         ResistancesRescaledSE
-        VERSION 3.3.0
+        VERSION 3.4.0
         DESCRIPTION "Version independent plugin for Resistances Rescaled based on https://gitlab.com/colorglass/commonlibsse-sample-plugin"
         LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
