@@ -28,17 +28,6 @@ namespace ResistancesRescaled {
         return -1;
     }
 
-    /// <summary>
-    /// Modifies a specific actor value of an actor by a certain value. Works like the papyrus function with the same
-    /// name.
-    /// </summary>
-    /// <param name="akActor">The actor, whose actor value is modifed.</param>
-    /// <param name="avID">The actor value id of the actor value that is modified.</param>
-    /// <param name="mod">The value by how much the actor value is modified.</param>
-    void ModActorValue(RE::Actor* akActor, RE::ActorValue av, float mod) {
-        akActor->AsActorValueOwner()->RestoreActorValue(RE::ACTOR_VALUE_MODIFIER::kPermanent, av, mod);
-    }
-
     float GetActorValue(RE::Actor* akActor, RE::ActorValue av) {
         return akActor->AsActorValueOwner()->GetActorValue(av);
     }
